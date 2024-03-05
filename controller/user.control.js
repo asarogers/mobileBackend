@@ -14,6 +14,7 @@ exports.register = async (req, res, next) => {
 }
 
 exports.login = async (req, res, next) => {
+    console.log("began login")
     try {
         const { email, password } = req.body;
         const user = await UserService.checkUser(email);
@@ -22,7 +23,7 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({ status: 401, message: "User doesn't exist" });
         }
 
-        
+
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(401).json({ status: 401, message: "Invalid password" });
