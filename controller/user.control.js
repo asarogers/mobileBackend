@@ -22,6 +22,7 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({ status: 401, message: "User doesn't exist" });
         }
 
+        
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(401).json({ status: 401, message: "Invalid password" });
