@@ -2,7 +2,7 @@ const app = require("./app");
 const db = require("./config/db")
 const userSchema = require("./model/user.model")
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 
 app.get("/",(req, res)=>{
