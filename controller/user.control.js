@@ -1,40 +1,38 @@
-const UserService = require("../services/user.services")
+const UserService = require("../services/user.services");
 
-exports.register = async(req, res, next)=>{
-    console.log("called register")
+exports.register = async (req, res, next) => {
+    console.log("called register");
     try {
-        const {email, password} = req.body;
-        const successRes = await UserService.registerUser(email, password);
+        const { email, password } = req.body;
+        await UserService.registerUser(email, password);
 
-        res.json({status: 200, successs: "User Successfully Registered"});
+        res.status(200).json({ status: 200, success: "User Successfully Registered" });
     } catch (error) {
-        throw error
+        console.error(error);
+        res.status(500).json({ status: 500, message: "Internal server error" });
     }
 }
 
-
-exports.login = async(req, res, next)=>{
+exports.login = async (req, res, next) => {
     try {
-        const {email, password} = req.body;
-        //if user exist
+        const { email, password } = req.body;
         const user = await UserService.checkUser(email);
 
-        //if user does not exist, throw error
-        if(!user){
-            throw new Error("User don't exist");
+        if (!user) {
+            return res.status(401).json({ status: 401, message: "User doesn't exist" });
         }
-    
 
         const isMatch = await user.comparePassword(password);
-        if(isMatch ==false){
-            throw new Error("Password Invalid");
+        if (!isMatch) {
+            return res.status(401).json({ status: 401, message: "Invalid password" });
         }
 
-        let tokenData =  {_id: user._id, email: user.email};
+        let tokenData = { _id: user._id, email: user.email };
+        const token = await UserService.generateToken(tokenData, "secretKey", "1h");
 
-        const token = await UserService.generateToken(tokenData, "secretKey", "1h")
-        res.status(200).json({status:true, token:token})
+        res.status(200).json({ status: 200, token: token });
     } catch (error) {
-        throw error
+        console.error(error);
+        res.status(500).json({ status: 500, message: "Internal server error" });
     }
 }
